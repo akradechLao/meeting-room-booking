@@ -84,7 +84,7 @@ export function Header() {
 
             <button
               className="btn btn-outline text-sm"
-              onClick={() => signOut({ callbackUrl: '/login' })}
+              onClick={() => signOut({ redirect: false }).then(() => window.location.href = '/login')}
               title="ออกจากระบบ"
             >
               <LogOut className="w-4 h-4" />
