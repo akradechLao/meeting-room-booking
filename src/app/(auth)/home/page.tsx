@@ -27,6 +27,8 @@ interface Booking {
   roomName: string;
   roomColor: string;
   qrToken: string;
+  userName?: string;
+  username?: string;
 }
 
 export default function HomePage() {
@@ -54,9 +56,12 @@ export default function HomePage() {
   const [qrToken, setQrToken] = useState('');
 
   const [showQR, setShowQR] = useState<Booking | null>(null);
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
+  const [allBookingsFilter, setAllBookingsFilter] = useState({ roomId: '', date: '' });
 
   useEffect(() => {
     loadData();
+    loadAllBookings();
   }, []);
 
   const loadData = async () => {
@@ -68,10 +73,20 @@ export default function HomePage() {
 
       if (roomsRes.ok) setRooms(await roomsRes.json());
       if (bookingsRes.ok) setBookings(await bookingsRes.json());
+      loadAllBookings();
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAllBookings = async () => {
+    try {
+      const res = await fetch('/api/bookings/all');
+      if (res.ok) setAllBookings(await res.json());
+    } catch (error) {
+      console.error('Error loading all bookings:', error);
     }
   };
 
@@ -170,6 +185,15 @@ export default function HomePage() {
     if (filters.status && b.status !== filters.status) return false;
     if (filters.from && new Date(b.endAt) < new Date(filters.from)) return false;
     if (filters.to && new Date(b.startAt) > new Date(filters.to + 'T23:59')) return false;
+    return true;
+  });
+
+  const filteredAllBookings = allBookings.filter((b) => {
+    if (allBookingsFilter.roomId && b.roomId !== allBookingsFilter.roomId) return false;
+    if (allBookingsFilter.date) {
+      const bookingDate = new Date(b.startAt).toISOString().split('T')[0];
+      if (bookingDate !== allBookingsFilter.date) return false;
+    }
     return true;
   });
 
@@ -367,6 +391,89 @@ export default function HomePage() {
                           ✕
                         </button>
                       )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* All Bookings - ดูการจองทั้งหมด */}
+      <section className="card overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+          <h2 className="font-bold text-gray-900">การจองทั้งหมด (ทุกคน)</h2>
+        </div>
+        <div className="px-5 py-3 border-b border-gray-100 flex flex-wrap gap-3 items-end">
+          <div className="min-w-[160px]">
+            <label className="text-sm font-semibold text-slate-600 block mb-1">ห้อง</label>
+            <select
+              className="input text-sm"
+              value={allBookingsFilter.roomId}
+              onChange={(e) => setAllBookingsFilter({ ...allBookingsFilter, roomId: e.target.value })}
+            >
+              <option value="">ทั้งหมด</option>
+              {rooms.map((r) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="min-w-[140px]">
+            <label className="text-sm font-semibold text-slate-600 block mb-1">วันที่</label>
+            <input
+              type="date"
+              className="input text-sm"
+              value={allBookingsFilter.date}
+              onChange={(e) => setAllBookingsFilter({ ...allBookingsFilter, date: e.target.value })}
+            />
+          </div>
+          <button
+            className="btn btn-ghost text-xs"
+            onClick={() => setAllBookingsFilter({ roomId: '', date: '' })}
+          >
+            ล้างตัวกรอง
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th className="text-slate-600">วัน/เวลา</th>
+                <th className="text-slate-600">ห้อง</th>
+                <th className="text-slate-600">หัวข้อ</th>
+                <th className="text-slate-600 hidden sm:table-cell">ผู้จอง</th>
+                <th className="text-slate-600 hidden md:table-cell">รายละเอียด</th>
+                <th className="text-slate-600">สถานะ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAllBookings.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                    ยังไม่มีการจอง
+                  </td>
+                </tr>
+              ) : (
+                filteredAllBookings.map((b) => (
+                  <tr key={b.id}>
+                    <td className="whitespace-nowrap">
+                      <div className="text-sm">{formatDateTH(b.startAt)}</div>
+                      <div className="text-xs text-slate-400">ถึง {formatDateTH(b.endAt)}</div>
+                    </td>
+                    <td>
+                      <span className="inline-flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full" style={{ background: b.roomColor }}></span>
+                        <span className="text-sm">{b.roomName}</span>
+                      </span>
+                    </td>
+                    <td>
+                      <div className="font-medium text-sm">{b.title}</div>
+                    </td>
+                    <td className="hidden sm:table-cell text-sm">{b.userName || '-'}</td>
+                    <td className="hidden md:table-cell text-sm text-slate-500">{b.description || '-'}</td>
+                    <td>
+                      <span className={`badge badge-${b.status}`}>{statusLabel(b.status)}</span>
                     </td>
                   </tr>
                 ))
