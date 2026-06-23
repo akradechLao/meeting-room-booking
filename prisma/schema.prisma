@@ -1,0 +1,126 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  username      String    @unique
+  passwordHash  String
+  role          String    @default("user") // admin | user
+  name          String
+  email         String?
+  telegramChatId String?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  bookings      Booking[]
+  recurringRules RecurringRule[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model Room {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  location    String?
+  floor       String?
+  building    String?
+  capacity    Int      @default(0)
+  equipment   String?
+  color       String   @default("#6366f1")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  bookings  Booking[]
+  blackouts Blackout[]
+
+  @@map("rooms")
+}
+
+model Booking {
+  id          String   @id @default(uuid())
+  roomId      String
+  userId      String
+  title       String
+  description String?
+  startAt     DateTime
+  endAt       DateTime
+  status      String   @default("pending") // pending | approved | rejected | cancelled | checked_in | completed
+  checkInAt   String?
+  checkOutAt  String?
+  qrToken     String   @unique
+  recurringId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  room        Room     @relation(fields: [roomId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([roomId])
+  @@index([userId])
+  @@index([status])
+  @@index([startAt, endAt])
+  @@map("bookings")
+}
+
+model RecurringRule {
+  id          String   @id @default(uuid())
+  userId      String
+  roomId      String
+  title       String
+  pattern     String   // daily | weekly | monthly
+  startDate   DateTime
+  endDate     DateTime
+  daysOfWeek  String?  // JSON array [0-6]
+  startTime   String   // "HH:mm"
+  durationMin Int
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("recurring_rules")
+}
+
+model Blackout {
+  id        String   @id @default(uuid())
+  roomId    String   @default("*") // "*" = all rooms
+  startAt   DateTime
+  endAt     DateTime
+  reason    String?
+  createdAt DateTime @default(now())
+
+  room      Room?    @relation(fields: [roomId], references: [id])
+
+  @@map("blackouts")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  ts        DateTime @default(now())
+  userId    String?
+  action    String
+  target    String?
+  details   String?
+
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([ts])
+  @@index([userId])
+  @@map("audit_logs")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+
+  @@map("settings")
+}
