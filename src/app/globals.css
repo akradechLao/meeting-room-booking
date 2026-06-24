@@ -456,3 +456,97 @@ tr.selected {
     border-radius: 14px;
   }
 }
+
+/* Responsive Typography Scale */
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+/* Touch Target Sizes */
+button, a, input, select, textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Responsive Container Utilities */
+.container-responsive {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Better Card Spacing for Mobile */
+@media (max-width: 640px) {
+  .card {
+    padding: 1rem;
+  }
+}
+
+/* Modal Responsive Improvements */
+.modal-responsive {
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .modal-responsive {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-responsive {
+    padding: 2rem;
+    max-width: 80%;
+  }
+}
+
+/* Hide/Show for different breakpoints */
+.mobile-only {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .mobile-only {
+    display: none;
+  }
+}
+
+desk-only {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .desk-only {
+    display: block;
+  }
+}

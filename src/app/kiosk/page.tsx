@@ -29,6 +29,18 @@ interface KioskRoom {
     userName: string;
   } | null;
   upcomingCount: number;
+  upcoming3Days: {
+    date: string;
+    label: string;
+    bookings: {
+      id: string;
+      title: string;
+      status: string;
+      startAt: string;
+      endAt: string;
+      userName: string;
+    }[];
+  }[];
 }
 
 export default function KioskPage() {
@@ -93,53 +105,53 @@ export default function KioskPage() {
         </div>
       </header>
 
-      <main className="p-6">
+      <main className="p-4 sm:p-6">
         {loading ? (
-          <div className="text-slate-400 col-span-full text-center py-20 text-lg">
+          <div className="text-slate-400 col-span-full text-center py-16 sm:py-20 text-base sm:text-lg">
             กำลังโหลด...
           </div>
         ) : rooms.length === 0 ? (
-          <div className="text-slate-400 col-span-full text-center py-20 text-lg">ยังไม่มีห้อง</div>
+          <div className="text-slate-400 col-span-full text-center py-16 sm:py-20 text-base sm:text-lg">ยังไม่มีห้อง</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
             {rooms.map((room) => (
               <div
                 key={room.id}
-                className={`p-6 rounded-2xl bg-white shadow-md hover:shadow-xl transition-shadow ${
+                className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-white shadow-sm sm:shadow-md hover:shadow-lg sm:hover:shadow-xl transition-all ${
                   room.isOccupied
                     ? 'ring-2 ring-red-200'
                     : 'ring-2 ring-emerald-200'
                 }`}
                 style={{ borderTop: `5px solid ${room.color}` }}
               >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="text-2xl font-bold leading-tight text-slate-900">{room.name}</div>
-                    <div className="text-sm text-slate-500 mt-1">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xl sm:text-2xl font-bold leading-tight text-slate-900 truncate">{room.name}</div>
+                    <div className="text-xs sm:text-sm text-slate-500 mt-1 line-clamp-1">
                       {room.location || ''} · 👥 {room.capacity || 0}
                     </div>
                   </div>
                   <span
-                    className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold shrink-0 ${
+                    className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shrink-0 ${
                       room.isOccupied
                         ? 'bg-red-100 text-red-600'
                         : 'bg-emerald-100 text-emerald-600'
                     }`}
                   >
                     <span
-                      className={`w-2.5 h-2.5 rounded-full ${
+                      className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${
                         room.isOccupied ? 'bg-red-400 pulse-red' : 'bg-emerald-400 pulse-blue'
                       }`}
                     ></span>{' '}
-                    {room.isOccupied ? 'กำลังใช้งาน' : 'ว่าง'}
+                    <span className="hidden xs:inline">{room.isOccupied ? 'กำลังใช้งาน' : 'ว่าง'}</span>
                   </span>
                 </div>
 
                 {room.current && (
-                  <div className="mt-4 p-4 rounded-xl bg-slate-50">
+                  <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50">
                     <div className="text-xs text-slate-500 font-semibold uppercase tracking-wide">ตอนนี้</div>
-                    <div className="font-semibold truncate text-slate-900 mt-1">{room.current.title}</div>
-                    <div className="text-sm text-slate-600 mt-1">
+                    <div className="font-semibold truncate text-slate-900 mt-1 text-sm sm:text-base">{room.current.title}</div>
+                    <div className="text-xs sm:text-sm text-slate-600 mt-1">
                       {room.current.userName || ''} · {formatTime(room.current.startAt)} -{' '}
                       {formatTime(room.current.endAt)}
                     </div>
@@ -147,27 +159,63 @@ export default function KioskPage() {
                 )}
 
                 {room.next ? (
-                  <div className="mt-3 p-4 rounded-xl bg-slate-50/50">
+                  <div className="mt-2 sm:mt-3 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50/50">
                     <div className="text-xs text-slate-500 font-semibold uppercase tracking-wide">ถัดไป</div>
-                    <div className="font-medium truncate text-slate-700 mt-1">{room.next.title}</div>
-                    <div className="text-sm text-slate-500 mt-1">
+                    <div className="font-medium truncate text-slate-700 mt-1 text-sm sm:text-base">{room.next.title}</div>
+                    <div className="text-xs sm:text-sm text-slate-500 mt-1">
                       {room.next.userName || ''} · {formatDateTH(room.next.startAt)}
                     </div>
                   </div>
                 ) : (
-                  <div className="mt-3 p-4 rounded-xl bg-slate-50/30 text-sm text-slate-400">
+                  <div className="mt-2 sm:mt-3 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50/30 text-xs sm:text-sm text-slate-400">
                     ไม่มีนัดถัดไปวันนี้
                   </div>
                 )}
 
-                <div className="text-sm text-slate-500 mt-3 font-medium">
+                {/* Upcoming 3 Days */}
+                <div className="mt-2 sm:mt-3">
+                  <div className="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-2">นัดล่วงหน้า 3 วัน</div>
+                  {room.upcoming3Days && room.upcoming3Days.length > 0 ? (
+                    <div className="space-y-2">
+                      {room.upcoming3Days.map((day) => (
+                        <div key={day.date} className="bg-slate-50/50 rounded-lg p-2">
+                          <div className="text-xs font-semibold text-slate-600 mb-1">{day.label}</div>
+                          {day.bookings.length > 0 ? (
+                            <div className="space-y-1">
+                              {day.bookings.slice(0, 3).map((booking) => (
+                                <div key={booking.id} className="flex items-center gap-2 text-xs">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0"></div>
+                                  <span className="truncate font-medium text-slate-700">{booking.title}</span>
+                                  <span className="text-slate-400 shrink-0">{formatTime(booking.startAt)}</span>
+                                </div>
+                              ))}
+                              {day.bookings.length > 3 && (
+                                <div className="text-xs text-slate-400 ml-3.5">
+                                  อีก {day.bookings.length - 3} นัด
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-xs text-slate-400">ว่าง</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-slate-400 bg-slate-50/30 rounded-lg p-2">
+                      ไม่มีนัดล่วงหน้า
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-xs sm:text-sm text-slate-500 mt-2 sm:mt-3 font-medium">
                   นัดวันนี้: {room.upcomingCount}
                 </div>
               </div>
             ))}
           </div>
         )}
-        <p className="text-slate-400 text-sm text-center mt-8">
+        <p className="text-slate-400 text-xs sm:text-sm text-center mt-6 sm:mt-8">
           หน้าจอนี้รีเฟรชอัตโนมัติทุก 30 วินาที
         </p>
       </main>

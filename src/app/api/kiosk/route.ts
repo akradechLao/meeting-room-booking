@@ -12,6 +12,12 @@ interface BookingInfo {
   userName: string;
 }
 
+interface UpcomingDay {
+  date: string;
+  label: string;
+  bookings: BookingInfo[];
+}
+
 interface RoomResult {
   id: string;
   name: string;
@@ -22,6 +28,7 @@ interface RoomResult {
   current: BookingInfo | null;
   next: BookingInfo | null;
   upcomingCount: number;
+  upcoming3Days: UpcomingDay[];
 }
 
 export async function GET() {
@@ -44,6 +51,7 @@ export async function GET() {
       current: null,
       next: null,
       upcomingCount: 0,
+      upcoming3Days: [],
     }));
 
     // Get all bookings for these rooms today
@@ -94,6 +102,49 @@ export async function GET() {
           userName: next.user?.name || '',
         };
       }
+
+      // Fetch upcoming bookings for next 3 days
+      const next3DaysBookings = await prisma.booking.findMany({
+        where: {
+          roomId: room.id,
+          status: { notIn: ['cancelled', 'rejected'] },
+          startAt: { gte: now },
+          startAt: { lte: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000) },
+        },
+        include: {
+          user: { select: { name: true } },
+        },
+        orderBy: { startAt: 'asc' },
+      });
+
+      // Group by date
+      const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+      const upcomingMap = new Map<string, BookingInfo[]>();
+
+      for (let i = 1; i <= 3; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        const dayLabel = `วัน${dayNames[date.getDay()]}ที่ ${date.getDate()}`;
+        upcomingMap.set(dateStr, { date: dateStr, label: dayLabel, bookings: [] });
+      }
+
+      for (const booking of next3DaysBookings) {
+        const bookingDate = new Date(booking.startAt).toISOString().split('T')[0];
+        const dayData = upcomingMap.get(bookingDate);
+        if (dayData) {
+          dayData.bookings.push({
+            id: booking.id,
+            title: booking.title,
+            status: booking.status,
+            startAt: booking.startAt.toISOString(),
+            endAt: booking.endAt.toISOString(),
+            userName: booking.user?.name || '',
+          });
+        }
+      }
+
+      room.upcoming3Days = Array.from(upcomingMap.values());
     }
 
     return NextResponse.json({ rooms: result, ts: now.toISOString() });

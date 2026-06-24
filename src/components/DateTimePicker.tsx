@@ -35,26 +35,26 @@ export function DateTimePicker({ value, onChange, label, required }: DateTimePic
   };
 
   return (
-    <div className="flex gap-2 items-end">
-      <div className="flex-1 min-w-0">
-        <label className="text-xs sm:text-sm font-semibold text-navy-700">{label}</label>
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
+      <div className="flex-1 min-w-0 w-full">
+        <label className="text-xs sm:text-sm font-semibold text-navy-700 block mb-1.5">{label}</label>
         <input
           type="date"
-          className="input mt-1"
+          className="input mt-1 py-2.5 sm:py-2 text-sm sm:text-base w-full"
           value={datePart}
           onChange={handleDateChange}
           required={required}
         />
       </div>
-      <div className="w-24 sm:w-32">
-        <label className="text-xs sm:text-sm font-semibold text-navy-700">เวลา</label>
+      <div className="w-full sm:w-28 md:w-32">
+        <label className="text-xs sm:text-sm font-semibold text-navy-700 block mb-1.5">เวลา</label>
         <select
-          className="input mt-1"
+          className="input mt-1 py-2.5 sm:py-2 text-sm sm:text-base w-full"
           value={timeValue}
           onChange={handleTimeChange}
         >
           {TIME_OPTIONS.map((t) => (
-            <option key={t} value={t}>{t}</option>
+            <option key={t} value={t} className="text-sm">{t}</option>
           ))}
         </select>
       </div>

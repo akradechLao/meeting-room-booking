@@ -269,11 +269,11 @@ export default function HomePage() {
       </section>
 
       {/* Filter */}
-      <section className="card p-5 flex flex-wrap gap-4 items-end">
+      <section className="card p-4 sm:p-5 flex flex-wrap gap-3 sm:gap-4 items-end">
         <div className="flex-1 min-w-[160px]">
           <label className="text-sm font-semibold text-slate-600 block mb-2">ห้อง</label>
           <select
-            className="input"
+            className="input py-2 sm:py-2.5 text-sm sm:text-base"
             value={filters.roomId}
             onChange={(e) => setFilters({ ...filters, roomId: e.target.value })}
           >
@@ -285,10 +285,10 @@ export default function HomePage() {
             ))}
           </select>
         </div>
-        <div className="min-w-[140px]">
+        <div className="w-full sm:flex-1 min-w-[140px]">
           <label className="text-sm font-semibold text-slate-600 block mb-2">สถานะ</label>
           <select
-            className="input"
+            className="input py-2 sm:py-2.5 text-sm sm:text-base w-full"
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           >
@@ -301,81 +301,81 @@ export default function HomePage() {
             <option value="rejected">ปฏิเสธ</option>
           </select>
         </div>
-        <div className="min-w-[140px]">
+        <div className="w-full sm:flex-1 min-w-[140px]">
           <label className="text-sm font-semibold text-slate-600 block mb-2">ตั้งแต่</label>
           <input
             type="date"
-            className="input"
+            className="input py-2 sm:py-2.5 text-sm sm:text-base w-full"
             value={filters.from}
             onChange={(e) => setFilters({ ...filters, from: e.target.value })}
           />
         </div>
-        <div className="min-w-[140px]">
+        <div className="w-full sm:flex-1 min-w-[140px]">
           <label className="text-sm font-semibold text-slate-600 block mb-2">ถึง</label>
           <input
             type="date"
-            className="input"
+            className="input py-2 sm:py-2.5 text-sm sm:text-base w-full"
             value={filters.to}
             onChange={(e) => setFilters({ ...filters, to: e.target.value })}
           />
         </div>
         <button
-          className="btn btn-ghost text-xs sm:text-sm"
+          className="btn btn-ghost text-xs sm:text-sm px-4 py-2.5 sm:px-5 sm:py-3 mt-2 sm:mt-0 w-full sm:w-auto"
           onClick={() => setFilters({ roomId: '', status: '', from: '', to: '' })}
         >
-          <RotateCcw className="w-4 h-4" /> รีเซ็ต
+          <RotateCcw className="w-4 h-4 mr-1" /> รีเซ็ต
         </button>
       </section>
 
-      {/* Bookings list */}
+      {/* Bookings list - Mobile Card View */}
       <section className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-          <h2 className="font-bold text-gray-900">การจองของฉัน</h2>
+        <div className="px-4 py-4 sm:px-5 sm:py-4 border-b border-gray-100 flex items-center gap-2">
+          <h2 className="font-bold text-gray-900 text-lg sm:text-xl">การจองของฉัน</h2>
         </div>
         <div className="overflow-x-auto">
-          <table>
+          <table className="min-w-full">
             <thead>
               <tr>
-                <th className="text-slate-600">ห้อง</th>
-                <th className="text-slate-600">หัวข้อ</th>
-                <th className="text-slate-600 hidden sm:table-cell">เริ่ม</th>
-                <th className="text-slate-600 hidden sm:table-cell">สิ้นสุด</th>
-                <th className="text-slate-600">สถานะ</th>
-                <th className="text-slate-600"></th>
+                <th className="text-slate-600 px-4 py-3 text-left">ห้อง</th>
+                <th className="text-slate-600 px-4 py-3 text-left">หัวข้อ</th>
+                <th className="text-slate-600 px-4 py-3 text-left hidden sm:table-cell">เริ่ม</th>
+                <th className="text-slate-600 px-4 py-3 text-left hidden sm:table-cell">สิ้นสุด</th>
+                <th className="text-slate-600 px-4 py-3 text-left">สถานะ</th>
+                <th className="text-slate-600 px-4 py-3 text-right"></th>
               </tr>
             </thead>
             <tbody>
               {filteredBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                  <td colSpan={6} className="py-12 text-center text-slate-400 px-4">
                     ยังไม่มีการจอง
                   </td>
                 </tr>
               ) : (
                 filteredBookings.map((b) => (
-                  <tr key={b.id}>
-                    <td>
+                  <tr key={b.id} className="border-b border-gray-50 hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-4">
                       <span className="inline-flex items-center gap-2">
                         <span
                           className="inline-block w-3 h-3 rounded-full"
                           style={{ background: b.roomColor }}
                         ></span>
-                        <span>{b.roomName}</span>
+                        <span className="text-sm sm:text-base font-medium">{b.roomName}</span>
                       </span>
                     </td>
-                    <td>
-                      <div className="font-medium">{b.title}</div>
-                      <div className="text-xs text-slate-400 sm:hidden">{formatDateTH(b.startAt)}</div>
+                    <td className="px-4 py-4">
+                      <div className="font-medium text-sm sm:text-base">{b.title}</div>
+                      <div className="text-xs text-slate-400 sm:hidden mt-1">{formatDateTH(b.startAt)}</div>
                     </td>
-                    <td className="hidden sm:table-cell">{formatDateTH(b.startAt)}</td>
-                    <td className="hidden sm:table-cell">{formatDateTH(b.endAt)}</td>
-                    <td>
-                      <span className={`badge badge-${b.status}`}>{statusLabel(b.status)}</span>
+                    <td className="px-4 py-4 hidden sm:table-cell text-sm">{formatDateTH(b.startAt)}</td>
+                    <td className="px-4 py-4 hidden sm:table-cell text-sm">{formatDateTH(b.endAt)}</td>
+                    <td className="px-4 py-4">
+                      <span className={`badge badge-${b.status} text-xs sm:text-sm`}>{statusLabel(b.status)}</span>
                     </td>
-                    <td className="text-right whitespace-nowrap">
+                    <td className="px-4 py-4 text-right whitespace-nowrap">
                       {b.status === 'approved' && (
                         <button
-                          className="btn btn-ghost p-2"
+                          className="btn btn-ghost p-2 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center"
                           title="QR Check-in"
                           onClick={() => setShowQR(b)}
                         >
@@ -384,7 +384,7 @@ export default function HomePage() {
                       )}
                       {['pending', 'approved'].includes(b.status) && (
                         <button
-                          className="btn btn-ghost p-2 text-red-500"
+                          className="btn btn-ghost p-2 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-red-500"
                           title="ยกเลิก"
                           onClick={() => handleCancel(b.id)}
                         >
@@ -398,18 +398,69 @@ export default function HomePage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Mobile Card View (shown only on mobile) */}
+        <div className="block sm:hidden space-y-3 p-4">
+          {filteredBookings.length === 0 ? (
+            <div className="py-8 text-center text-slate-400">
+              ยังไม่มีการจอง
+            </div>
+          ) : (
+            filteredBookings.map((b) => (
+              <div
+                key={`mobile-${b.id}`}
+                className="card p-4 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="inline-block w-3 h-3 rounded-full"
+                      style={{ background: b.roomColor }}
+                    ></span>
+                    <span className="font-semibold text-sm">{b.roomName}</span>
+                  </div>
+                  <span className={`badge badge-${b.status} text-xs`}>{statusLabel(b.status)}</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="font-medium">{b.title}</div>
+                  <div className="text-xs text-slate-500">
+                    {formatDateTH(b.startAt)} - {formatDateTH(b.endAt)}
+                  </div>
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+                    {b.status === 'approved' && (
+                      <button
+                        className="btn btn-primary btn-sm flex-1"
+                        onClick={() => setShowQR(b)}
+                      >
+                        <QrCode className="w-3 h-3 mr-1" /> Check-in
+                      </button>
+                    )}
+                    {['pending', 'approved'].includes(b.status) && (
+                      <button
+                        className="btn btn-outline btn-sm text-red-500 flex-1"
+                        onClick={() => handleCancel(b.id)}
+                      >
+                        ยกเลิก
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </section>
 
       {/* All Bookings - ดูการจองทั้งหมด */}
       <section className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-          <h2 className="font-bold text-gray-900">การจองทั้งหมด (ทุกคน)</h2>
+        <div className="px-4 py-4 sm:px-5 sm:py-4 border-b border-gray-100 flex items-center gap-2">
+          <h2 className="font-bold text-gray-900 text-lg sm:text-xl">การจองทั้งหมด (ทุกคน)</h2>
         </div>
-        <div className="px-5 py-3 border-b border-gray-100 flex flex-wrap gap-3 items-end">
-          <div className="min-w-[160px]">
+        <div className="px-4 py-3 sm:px-5 sm:py-3 border-b border-gray-100 flex flex-col sm:flex-row gap-3 sm:gap-4 items-end">
+          <div className="w-full sm:flex-1 min-w-[160px]">
             <label className="text-sm font-semibold text-slate-600 block mb-1">ห้อง</label>
             <select
-              className="input text-sm"
+              className="input text-sm sm:text-base w-full"
               value={allBookingsFilter.roomId}
               onChange={(e) => setAllBookingsFilter({ ...allBookingsFilter, roomId: e.target.value })}
             >
@@ -419,61 +470,61 @@ export default function HomePage() {
               ))}
             </select>
           </div>
-          <div className="min-w-[140px]">
+          <div className="w-full sm:flex-1 min-w-[140px]">
             <label className="text-sm font-semibold text-slate-600 block mb-1">วันที่</label>
             <input
               type="date"
-              className="input text-sm"
+              className="input text-sm sm:text-base w-full"
               value={allBookingsFilter.date}
               onChange={(e) => setAllBookingsFilter({ ...allBookingsFilter, date: e.target.value })}
             />
           </div>
           <button
-            className="btn btn-ghost text-xs"
+            className="btn btn-ghost text-xs sm:text-sm px-4 py-2.5 sm:px-5 w-full sm:w-auto"
             onClick={() => setAllBookingsFilter({ roomId: '', date: '' })}
           >
             ล้างตัวกรอง
           </button>
         </div>
         <div className="overflow-x-auto">
-          <table>
+          <table className="min-w-full">
             <thead>
               <tr>
-                <th className="text-slate-600">วัน/เวลา</th>
-                <th className="text-slate-600">ห้อง</th>
-                <th className="text-slate-600">หัวข้อ</th>
-                <th className="text-slate-600 hidden sm:table-cell">ผู้จอง</th>
-                <th className="text-slate-600 hidden md:table-cell">รายละเอียด</th>
-                <th className="text-slate-600">สถานะ</th>
+                <th className="text-slate-600 px-4 py-3 text-left text-xs sm:text-sm">วัน/เวลา</th>
+                <th className="text-slate-600 px-4 py-3 text-left text-xs sm:text-sm">ห้อง</th>
+                <th className="text-slate-600 px-4 py-3 text-left text-xs sm:text-sm">หัวข้อ</th>
+                <th className="text-slate-600 px-4 py-3 text-left text-xs sm:text-sm hidden sm:table-cell">ผู้จอง</th>
+                <th className="text-slate-600 px-4 py-3 text-left text-xs sm:text-sm hidden md:table-cell">รายละเอียด</th>
+                <th className="text-slate-600 px-4 py-3 text-left text-xs sm:text-sm">สถานะ</th>
               </tr>
             </thead>
             <tbody>
               {filteredAllBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                  <td colSpan={6} className="py-12 text-center text-slate-400 px-4">
                     ยังไม่มีการจอง
                   </td>
                 </tr>
               ) : (
                 filteredAllBookings.map((b) => (
-                  <tr key={b.id}>
-                    <td className="whitespace-nowrap">
+                  <tr key={b.id} className="border-b border-gray-50 hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm">{formatDateTH(b.startAt)}</div>
                       <div className="text-xs text-slate-400">ถึง {formatDateTH(b.endAt)}</div>
                     </td>
-                    <td>
+                    <td className="px-4 py-4">
                       <span className="inline-flex items-center gap-2">
                         <span className="inline-block w-3 h-3 rounded-full" style={{ background: b.roomColor }}></span>
                         <span className="text-sm">{b.roomName}</span>
                       </span>
                     </td>
-                    <td>
+                    <td className="px-4 py-4">
                       <div className="font-medium text-sm">{b.title}</div>
                     </td>
-                    <td className="hidden sm:table-cell text-sm">{b.userName || '-'}</td>
-                    <td className="hidden md:table-cell text-sm text-slate-500">{b.description || '-'}</td>
-                    <td>
-                      <span className={`badge badge-${b.status}`}>{statusLabel(b.status)}</span>
+                    <td className="px-4 py-4 hidden sm:table-cell text-sm">{b.userName || '-'}</td>
+                    <td className="px-4 py-4 hidden md:table-cell text-sm text-slate-500">{b.description || '-'}</td>
+                    <td className="px-4 py-4">
+                      <span className={`badge badge-${b.status} text-xs sm:text-sm`}>{statusLabel(b.status)}</span>
                     </td>
                   </tr>
                 ))
