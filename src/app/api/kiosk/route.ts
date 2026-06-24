@@ -104,12 +104,12 @@ export async function GET() {
       }
 
       // Fetch upcoming bookings for next 3 days
+      const next3DaysEnd = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
       const next3DaysBookings = await prisma.booking.findMany({
         where: {
           roomId: room.id,
           status: { notIn: ['cancelled', 'rejected'] },
-          startAt: { gte: now },
-          startAt: { lte: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000) },
+          startAt: { gte: now, lte: next3DaysEnd },
         },
         include: {
           user: { select: { name: true } },
@@ -119,7 +119,7 @@ export async function GET() {
 
       // Group by date
       const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-      const upcomingMap = new Map<string, BookingInfo[]>();
+      const upcomingMap = new Map<string, UpcomingDay>();
 
       for (let i = 1; i <= 3; i++) {
         const date = new Date(now);
